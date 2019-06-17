@@ -595,10 +595,6 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
             int rRight = mScreenW / 2 + mScreenH / 2;
             int rTop = 0;
             int rBottom = mScreenH;
-
-            //TODO 言诚修改
-//            rLeft=rRight=650;
-//            rTop=rBottom = 80;
             RectF newDetectedRect = new RectF(rLeft, rTop, rRight, rBottom);
             cropProcessor.setDetectedRect(newDetectedRect);
         }

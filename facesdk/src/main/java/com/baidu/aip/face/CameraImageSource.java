@@ -5,10 +5,10 @@ package com.baidu.aip.face;
 
 import android.content.Context;
 
-import com.baidu.aip.FaceDetector;
 import com.baidu.aip.ImageFrame;
 import com.baidu.aip.face.camera.Camera1Control;
 import com.baidu.aip.face.camera.ICameraControl;
+import com.baidu.idl.facesdk.FaceSDK;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -51,22 +51,22 @@ public class CameraImageSource extends ImageSource {
                 }
 
                 rotation = rotation < 0 ? 360 + rotation : rotation;
-                FaceDetector.yuvToARGB(data, width, height, argb, rotation, 0);
+//                FaceDetector.yuvToARGB(data, width, height, argb, rotation, 0);
 
                 //   FaceSDK.getARGBFromYUVimg(data, argb, width, height, rotation, 0);
 
                 // liujinhui modify
 
                 //TODO  start言诚修改
-//                FaceSDK.getARGBFromYUVimg(data, argb,
-//                        width, height,
-//                        360 - rotation, 0);
-//
-//                if (rotation %180 ==0) {
-//                    int temp = width;
-//                    width = height;
-//                    height = temp;
-//                }
+                FaceSDK.getARGBFromYUVimg(data, argb,
+                        width, height,
+                        360 - rotation, 0);
+
+                if (rotation %180 ==0) {
+                    int temp = width;
+                    width = height;
+                    height = temp;
+                }
 
 
 
@@ -74,11 +74,11 @@ public class CameraImageSource extends ImageSource {
 
 
 //                 旋转了90或270度。高宽需要替换
-                if (rotation % 180 == 90) {
-                    int temp = width;
-                    width = height;
-                    height = temp;
-                }
+//                if (rotation % 180 == 90) {
+//                    int temp = width;
+//                    width = height;
+//                    height = temp;
+//                }
 
                 ImageFrame frame = new ImageFrame();
                 frame.setArgb(argb);

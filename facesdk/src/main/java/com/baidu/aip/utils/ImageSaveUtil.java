@@ -10,6 +10,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Base64;
+
+import com.blankj.utilcode.util.ImageUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -142,4 +145,13 @@ public class ImageSaveUtil {
         return total > 9999 ? true : false;
     }
 
+    //头像命名规范
+    public static String createFile(String uuid) {
+        return uuid+".jpg";
+    }
+
+    //bitmap对象转成base64
+    public static String bitmapToString(Bitmap bitmap) {
+      return   Base64.encodeToString(ImageUtils.bitmap2Bytes(bitmap, Bitmap.CompressFormat.JPEG), Base64.DEFAULT);
+    }
 }

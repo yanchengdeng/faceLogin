@@ -27,7 +27,7 @@ import retrofit2.Response;
 /**
  * 接口请求
  */
-public class API {
+public class API<T> {
 
 
     /**
@@ -84,7 +84,7 @@ public class API {
      * @param apiCallBack
      * @param <T>
      */
-    public static <T> void getBaiduObject(Call<ResultInfo> call, final Class clz, final ApiCallBack apiCallBack) {
+    public static <T> void getBaiduObject(Call<ResultInfo> call, final Class clz, final ApiCallBack<T> apiCallBack) {
         if (call == null) {
             throw new IllegalArgumentException("call不能为空");
         }
@@ -170,7 +170,6 @@ public class API {
                     try {
                         body.writeTo(requestBuffer);
 //                        Log.w(ApiConfig.getLogFilter(), String.format("接口请求:url---->  %s", response.raw().request().url().toString() + postParseParams(body, requestBuffer)));
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

@@ -71,6 +71,7 @@ public class FaceSDKManager {
             faceTracker.set_track_by_detection_interval(800);
             return faceTracker;
         }
+
         return faceTracker;
     }
 

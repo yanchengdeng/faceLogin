@@ -35,7 +35,7 @@ public class ApiTest {
                     SysUtils.log("accessToken 获取成功：");
                     HashMap<String,String> maps = new HashMap<>();
                     maps.put("access_token",accessToken.access_token);
-                    ApiConfig.setCommonParams(maps);
+//                    ApiConfig.setCommonParams(maps);
 
                 }
             }

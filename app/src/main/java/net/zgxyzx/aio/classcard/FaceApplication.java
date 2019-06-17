@@ -12,8 +12,9 @@ public class FaceApplication extends Application {
         super.onCreate();
 
         FaceUtils.init(this, Config.groupID, Config.licenseID, Config.licenseFileName);
-        ApiConfig.init(this, "aip.baidubce.com");
+        ApiConfig.init(this, "https://aip.baidubce.com");
         ApiConfig.setLogFilter("dyc");
+        ApiConfig.setDebug(true);
         ApiTest.getToken(Config.apiKey, Config.secretKey);
     }
 }

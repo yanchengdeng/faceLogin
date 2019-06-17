@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.baidu.aip.utils.SysUtils;
+import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.ToastUtils;
 
 import net.zgxyzx.aio.classcard.R;
@@ -47,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, DetectLoginActivity.class));
         }
     });
+
+
+       SysUtils.log(ScreenUtils.getScreenWidth()+"---"+ ScreenUtils.getScreenHeight());
 }
 
 

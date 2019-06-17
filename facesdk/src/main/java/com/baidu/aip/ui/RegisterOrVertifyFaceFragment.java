@@ -33,10 +33,10 @@ import com.baidu.aip.api.ApiCallBack;
 import com.baidu.aip.api.ApiConfig;
 import com.baidu.aip.api.ApiService;
 import com.baidu.aip.api.ResultInfo;
-import com.baidu.aip.bean.AccessToken;
 import com.baidu.aip.bean.FUNCTION_TYPE;
 import com.baidu.aip.bean.RegistFaceResult;
 import com.baidu.aip.bean.RegisterFaceParams;
+import com.baidu.aip.bean.VertifyFaceResult;
 import com.baidu.aip.face.CameraImageSource;
 import com.baidu.aip.face.DetectRegionProcessor;
 import com.baidu.aip.face.FaceDetectManager;
@@ -51,6 +51,7 @@ import com.baidu.aip.widget.WaveHelper;
 import com.baidu.aip.widget.WaveView;
 import com.baidu.idl.facesdk.FaceInfo;
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,6 +99,7 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
     private boolean mBeginDetect = false;
     private RelativeLayout rootView;
     private View view;
+    private int mDetectCount = 0;
 
 
     public RegisterOrVertifyFaceFragment() {
@@ -175,6 +177,9 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
         mHandler.sendEmptyMessageDelayed(MSG_BEGIN_DETECT, 500);
     }
 
+
+
+
     private void initView(View view) {
         mInitView = view.findViewById(R.id.camera_layout);
         previewView = (PreviewView) view.findViewById(R.id.preview_view);
@@ -190,6 +195,10 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
             @Override
             public void onDetectFace(final int retCode, FaceInfo[] infos, ImageFrame frame) {
                 String str = "";
+                if (infos != null && infos[0] != null) {
+                    ToastUtils.showShort("--关键点---"+infos);
+                }
+//                SysUtils.log("face_dyc",retCode+"....width:..."+frame.getWidth()+"..height:."+frame.getHeight());
                 if (retCode == 0) {
                     if (infos != null && infos[0] != null) {
                         FaceInfo info = infos[0];
@@ -296,19 +305,19 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
                 }
 
                 mCurTips = str;
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        if ((System.currentTimeMillis() - mLastTipsTime) > 1000) {
-//                            nameTextView.setText(mCurTips);
-//                            mLastTipsTime = System.currentTimeMillis();
-//                        }
-//                        if (mGoodDetect && resultCode == 0) {
-//                            nameTextView.setText("");
-//                            showProgressBar(true);
-//                        }
-//                    }
-//                });
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if ((System.currentTimeMillis() - mLastTipsTime) > 1000) {
+                            nameTextView.setText(mCurTips);
+                            mLastTipsTime = System.currentTimeMillis();
+                        }
+                        if (mGoodDetect && resultCode == 0) {
+                            nameTextView.setText("");
+                            showProgressBar(true);
+                        }
+                    }
+                });
 
                 if (infos == null) {
                     mGoodDetect = false;
@@ -321,27 +330,32 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
             @Override
             public void onTrack(FaceFilter.TrackedModel trackedModel) {
                 if (trackedModel.meetCriteria() && mGoodDetect) {
-                    // upload(trackedModel);
                     mGoodDetect = false;
-                    if (!mSavedBmp && mBeginDetect) {
-                        if (saveFaceBmp(trackedModel)) {
-                            String filePath = ImageSaveUtil.loadCameraBitmapPath(getContext(), "head_tmp.jpg");
-                             File file = new File(filePath);
-                            if (!file.exists()) {
-                                SysUtils.log("人脸文件不存在");
-                                if (FaceUtils.scanFaceListener != null) {
-                                    FaceUtils.scanFaceListener.onFaild(-1, "人脸文件不存在");
+                    if (functionType==FUNCTION_TYPE.FUNCTION_TYPE_REGISTER) {
+                        if (!mSavedBmp && mBeginDetect) {
+                            if (saveFaceBmp(trackedModel)) {
+                                String filePath = ImageSaveUtil.loadCameraBitmapPath(getContext(), ImageSaveUtil.createFile(registerFaceParams.uuid));
+                                File file = new File(filePath);
+                                if (!file.exists()) {
+                                    SysUtils.log("人脸文件不存在");
+                                    if (FaceUtils.scanFaceListener != null) {
+                                        FaceUtils.scanFaceListener.onFaild(-1, "人脸文件不存在");
+                                    }
+                                    return;
                                 }
-                                return;
+                                registerFace(file);
                             }
-                            registerFace(file);
-
+                        }
+                    }else if (functionType==FUNCTION_TYPE.FUNCTION_TYPE_VERTIFY){
+                        if (trackedModel.getEvent() != FaceFilter.Event.OnLeave) {
+                            mDetectCount++;
+                            final Bitmap face = trackedModel.cropFace();
+                            vertifyFace(face);
                         }
                     }
                 }
             }
         });
-
 
         rectView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -365,6 +379,7 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
         }
         int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
         cameraImageSource.getCameraControl().setDisplayOrientation(rotation);
+
         //   previewView.getTextureView().setScaleX(-1);
         nameTextView = (TextView) view.findViewById(R.id.name_text_view);
         mSuccessView = (ImageView) view.findViewById(R.id.success_image);
@@ -410,12 +425,12 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
      * 可选：liveness_control 活体检测控制 NONE: 不进行控制 LOW:较低的活体要求(高通过率 低攻击拒绝率) NORMAL: 一般的活体要求(平衡的攻击拒绝率, 通过率) HIGH: 较高的活体要求(高攻击拒绝率 低通过率) 默认NONE
      */
 
-    private void registerFace(File filePath) {
+    private void registerFace(final File file) {
 
 
         String base64Img = "";
         try {
-            byte[] buf = readFile(filePath);
+            byte[] buf = readFile(file);
 
             base64Img = new String(Base64.encode(buf, Base64.NO_WRAP));
 
@@ -431,18 +446,90 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
         hashMap.put("user_info",registerFaceParams.name);
         hashMap.put("quality_control",ApiConfig.getQualityControl());
         hashMap.put("liveness_control",ApiConfig.getLivenessControl());
+        hashMap.put("access_token",ApiConfig.getAccessToken());
 
         Call<ResultInfo> call = ApiConfig.getInstants().create(ApiService.class).register(hashMap);
-        API.getBaiduObject(call, AccessToken.class, new ApiCallBack<RegistFaceResult>() {
+
+        API.getBaiduObject(call, RegistFaceResult.class, new ApiCallBack<RegistFaceResult>() {
             @Override
-            public void onSuccess(int msgCode, String msg, RegistFaceResult accessToken) {
-
-                SysUtils.log("dyc","======注册成功");
-
+            public void onSuccess(int msgCode, String msg, RegistFaceResult registFaceResult) {
+                if (FaceUtils.scanFaceListener!=null){
+                    registFaceResult.setNativeHeadPhoto(file.getPath());
+                    FaceUtils.scanFaceListener.onSucess(registFaceResult);
+                }
+                if (getActivity()!=null) {
+                    getActivity().finish();
+                }
             }
             @Override
             public void onFaild(int msgCode, String msg) {
-                SysUtils.log("dyc","======注册成功");
+                if (FaceUtils.scanFaceListener!=null){
+                    FaceUtils.scanFaceListener.onFaild(msgCode,msg);
+                }
+                if (getActivity()!=null) {
+                    getActivity().finish();
+                }
+
+            }
+        });
+    }
+
+
+    /**
+     * 人脸认证
+     * image：	是	string	图片信息(总数据大小应小于10M)，图片上传方式根据image_type来判断
+     * image_type：	是	string	图片类型
+     * BASE64:图片的base64值，base64编码后的图片数据，编码后的图片大小不超过2M；URL:图片的 URL地址( 可能由于网络等原因导致下载图片时间过长)；FACE_TOKEN: 人脸图片的唯一标识，调用人脸检测接口时，会为每个人脸图片赋予一个唯一的FACE_TOKEN，同一张图片多次检测得到的FACE_TOKEN是同一个。
+     * group_id_list	是	string	从指定的group中进行查找 用逗号分隔，上限10个
+     *可选： quality_control 图片质量控制 NONE: 不进行控制 LOW:较低的质量要求 NORMAL: 一般的质量要求 HIGH: 较高的质量要求 默认 NONE
+     *
+     * 可选：liveness_control 活体检测控制 NONE: 不进行控制 LOW:较低的活体要求(高通过率 低攻击拒绝率) NORMAL: 一般的活体要求(平衡的攻击拒绝率, 通过率) HIGH: 较高的活体要求(高攻击拒绝率 低通过率) 默认NONE
+
+     * user_id	：	string	当需要对特定用户进行比对时，指定user_id进行比对。即人脸认证功能。
+     * 可选：max_user_num	：	unit32	查找后返回的用户数量。返回相似度最高的几个用户，默认为1，最多返回50个。
+     * @param bitmap
+     */
+    private void vertifyFace(final Bitmap bitmap ){
+
+        if (mDetectCount>1){
+            return;
+        }
+
+        if (bitmap==null){
+            return;
+        }
+
+        HashMap<String,String> hashMap = new HashMap<>();
+        hashMap.put("image",ImageSaveUtil.bitmapToString(bitmap));
+        hashMap.put("image_type","BASE64");
+        hashMap.put("group_id_list",ApiConfig.getGroupId());
+        hashMap.put("quality_control",ApiConfig.getQualityControl());
+        hashMap.put("liveness_control",ApiConfig.getLivenessControl());
+        if (registerFaceParams!=null && !TextUtils.isEmpty(registerFaceParams.uuid)){
+            hashMap.put("user_id",registerFaceParams.uuid);
+        }
+        hashMap.put("access_token",ApiConfig.getAccessToken());
+
+        Call<ResultInfo> call = ApiConfig.getInstants().create(ApiService.class).vertify(hashMap);
+
+        API.getBaiduObject(call, VertifyFaceResult.class, new ApiCallBack<VertifyFaceResult>() {
+            @Override
+            public void onSuccess(int msgCode, String msg, VertifyFaceResult registFaceResult) {
+
+                if (FaceUtils.vertifyFaceListener!=null){
+                    FaceUtils.vertifyFaceListener.onSucess(registFaceResult);
+                }
+
+                if (getActivity()!=null) {
+                    getActivity().finish();
+                }
+            }
+            @Override
+            public void onFaild(int msgCode, String msg) {
+                if (FaceUtils.vertifyFaceListener!=null){
+                    FaceUtils.vertifyFaceListener.onFaild(msgCode,msg);
+                }
+
 
             }
         });
@@ -509,6 +596,9 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
             int rTop = 0;
             int rBottom = mScreenH;
 
+            //TODO 言诚修改
+//            rLeft=rRight=650;
+//            rTop=rBottom = 80;
             RectF newDetectedRect = new RectF(rLeft, rTop, rRight, rBottom);
             cropProcessor.setDetectedRect(newDetectedRect);
         }
@@ -518,8 +608,6 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
     }
 
     private void initWaveview(Rect rect) {
-
-
         RelativeLayout.LayoutParams waveParams = new RelativeLayout.LayoutParams(
                 rect.width(), rect.height());
 
@@ -560,6 +648,9 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
     }
 
     private void showProgressBar(final boolean show) {
+        if (getActivity()==null) {
+            return;
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -641,9 +732,9 @@ public class RegisterOrVertifyFaceFragment extends Fragment {
 
         final Bitmap face = model.cropFace();
         if (face != null) {
-            ImageSaveUtil.saveCameraBitmap(getActivity(), face, "head_tmp.jpg");
+            ImageSaveUtil.saveCameraBitmap(getActivity(), face, ImageSaveUtil.createFile(registerFaceParams.uuid));
         }
-        String filePath = ImageSaveUtil.loadCameraBitmapPath(getActivity(), "head_tmp.jpg");
+        String filePath = ImageSaveUtil.loadCameraBitmapPath(getActivity(), ImageSaveUtil.createFile(registerFaceParams.uuid));
         final File file = new File(filePath);
         if (!file.exists()) {
             return false;

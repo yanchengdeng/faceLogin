@@ -21,6 +21,6 @@ public class Config {
      * 人脸识别 接口 https://aip.baidubce.com/rest/2.0/face/v3/search
      * 人脸注册 接口 https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add
      */
-    public static String groupID = "ddzx_face";
+    public static String groupID = "0";
 
 }

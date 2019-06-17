@@ -3,7 +3,9 @@
  */
 package com.baidu.aip.face;
 
-import java.util.ArrayList;
+import android.content.Context;
+import android.os.Handler;
+import android.os.HandlerThread;
 
 import com.baidu.aip.FaceSDKManager;
 import com.baidu.aip.ImageFrame;
@@ -12,9 +14,7 @@ import com.baidu.idl.facesdk.FaceInfo;
 import com.baidu.idl.facesdk.FaceSDK;
 import com.baidu.idl.facesdk.FaceTracker;
 
-import android.content.Context;
-import android.os.Handler;
-import android.os.HandlerThread;
+import java.util.ArrayList;
 
 /**
  * 封装了人脸检测的整体逻辑。

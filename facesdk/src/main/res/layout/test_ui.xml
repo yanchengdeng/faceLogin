@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="650px"
+        android:layout_marginTop="80px"
+        android:layout_marginRight="650px"
+        android:layout_marginBottom="80px"
+        android:background="#ff0000"
+        android:text="矩形采集"
+        android:textColor="#ff0000"
+        android:textSize="20sp" />
+
+
+ <android.support.v4.widget.ContentLoadingProgressBar
+     android:layout_width="620px"
+     android:layout_centerInParent="true"
+     style="@android:style/Widget.Holo.ProgressBar.Large"
+     android:background="#00ff00"
+     android:layout_height="620px" />
+
+
+</RelativeLayout>
+

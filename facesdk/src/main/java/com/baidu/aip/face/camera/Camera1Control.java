@@ -3,15 +3,6 @@
  */
 package com.baidu.aip.face.camera;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.baidu.aip.face.PreviewView;
-
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -27,6 +18,15 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+
+import com.baidu.aip.face.PreviewView;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 5.0以下相机API的封装。
@@ -45,6 +45,14 @@ public class Camera1Control implements ICameraControl {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
+    //TODO  言诚  更改次数  修改 电子班牌 平板相机角度问题
+    //TDOO  当时切到手机上 就有问题了
+//    static {
+//        ORIENTATIONS.append(Surface.ROTATION_0, 0);
+//        ORIENTATIONS.append(Surface.ROTATION_90, 90);
+//        ORIENTATIONS.append(Surface.ROTATION_180, 180);
+//        ORIENTATIONS.append(Surface.ROTATION_270, 270);
+//    }
 
     private int displayOrientation = 0;
     private int cameraId = 0;
@@ -141,9 +149,8 @@ public class Camera1Control implements ICameraControl {
         }
 
         surfaceTexture = new SurfaceTexture(11);
-        parameters.setRotation(90); // TODO
+        parameters.setRotation(90);
         int rotation = ORIENTATIONS.get(displayOrientation);
-
         camera.setDisplayOrientation(rotation);
         try {
             camera.setPreviewCallback(new Camera.PreviewCallback() {

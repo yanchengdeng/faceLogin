@@ -3,10 +3,10 @@
  */
 package com.baidu.aip.face;
 
-import com.baidu.aip.ImageFrame;
-
 import android.graphics.Rect;
 import android.graphics.RectF;
+
+import com.baidu.aip.ImageFrame;
 
 /**
  * 裁剪一定区域内的图片进行检测。
@@ -38,6 +38,11 @@ public class DetectRegionProcessor implements FaceProcessor {
             cropRect.top = (int) originalCoordinate.top;
             cropRect.right = (int) originalCoordinate.right;
             cropRect.bottom = (int) originalCoordinate.bottom;
+
+
+
+
+
             frame.setArgb(FaceCropper.crop(frame.getArgb(), frame.getWidth(), cropRect));
             frame.setWidth(cropRect.width());
             frame.setHeight(cropRect.height());

@@ -306,7 +306,7 @@ public class ApiConfig {
 //                            .cookieJar(cookieJar)
                             .cache(cache)
 //                            .addInterceptor(new HeadersInterceptor())
-//                            .addInterceptor(new CommonParamsInterceptor())
+                            .addInterceptor(new CommonParamsInterceptor())
 //                            .addInterceptor(new CacheInterceptor())
                             .addInterceptor(new LogInterceptor())
 //                            .addInterceptor(new EncryptInterceptor())

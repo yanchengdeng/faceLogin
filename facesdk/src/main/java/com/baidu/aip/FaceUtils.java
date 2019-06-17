@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.baidu.aip.api.ApiConfig;
 import com.baidu.aip.listeners.ScanFaceListener;
+import com.baidu.aip.listeners.VertifyFaceListener;
 import com.baidu.idl.facesdk.FaceTracker;
 
 /**
@@ -15,6 +16,8 @@ import com.baidu.idl.facesdk.FaceTracker;
 public class FaceUtils {
 
     public static ScanFaceListener scanFaceListener;
+
+    public static VertifyFaceListener vertifyFaceListener;
 
     /**
      *
@@ -68,5 +71,9 @@ public class FaceUtils {
 
     public static void setScanFaceListener(ScanFaceListener listener){
         scanFaceListener =  listener;
+    }
+
+    public static void setVertifyFaceListener(VertifyFaceListener listener){
+        vertifyFaceListener = listener;
     }
 }

@@ -1,8 +1,6 @@
-package com.baidu.aip.widget;
-/*
- * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
+package com.baidu.aip.widget; /**
+ * Copyright (C) 2017 Baidu Inc. All rights reserved.
  */
-
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -25,7 +23,7 @@ import com.blankj.utilcode.util.ConvertUtils;
  */
 public class FaceRoundView extends View {
 
-    private static final String TAG = "FaceRoundView";
+    private static final String TAG = FaceRoundView.class.getSimpleName();
 
     public static final float SURFACE_HEIGHT = 1000f;
     public static final float SURFACE_RATIO = 0.75f;
@@ -37,12 +35,15 @@ public class FaceRoundView extends View {
     public static final int PATH_SMALL_SPACE = 12;
     public static final int PATH_WIDTH = 4;
 
-    //  public static final int COLOR_BG = Color.parseColor("#2F2F33");
-    //  public static final int COLOR_RECT = Color.parseColor("#FFFFFF");
-    //  public static final int COLOR_ROUND = Color.parseColor("#FFA800");
-    public static final int COLOR_BG = Color.parseColor("#FFFFFF");
-    public static final int COLOR_RECT = Color.parseColor("#FFFFFF");
-    public static final int COLOR_ROUND = Color.parseColor("#FFA800");
+//    public static final int COLOR_BG = Color.parseColor("#2F2F33");
+//    public static final int COLOR_RECT = Color.parseColor("#FFFFFF");
+//    public static final int COLOR_ROUND = Color.parseColor("#FFA800");
+
+
+    //TODO  言诚修改
+    public static final int COLOR_BG = Color.argb(100,255,0,0);
+    public static final int COLOR_RECT = Color.argb(100,0,0,255);
+    public static final int COLOR_ROUND = Color.argb(100,0,255,0);
 
     private PathEffect mFaceRoundPathEffect = null;
     // new DashPathEffect(new float[]{PATH_SPACE, PATH_SPACE}, 1);
@@ -120,17 +121,14 @@ public class FaceRoundView extends View {
         float canvasWidth = right - left;
         float canvasHeight = bottom - top;
 
-        float x = 0;
-        float y = 0;
-        float r = 0;
-        if (canvasWidth < canvasHeight) {
-            x = canvasWidth / 2;
-            y = (canvasHeight / 2) - ((canvasHeight / 2) * HEIGHT_RATIO);
-            r = (canvasWidth / 2) - ((canvasWidth / 2) * WIDTH_SPACE_RATIO);
-        } else {
-            x = canvasWidth / 2;
-            y = canvasHeight / 2;
+        float x = canvasWidth / 2;
+        float y = (canvasHeight / 2) - ((canvasHeight / 2) * HEIGHT_RATIO);
+        float r;
+        //TODO 言诚   针对横竖屏  分别  扫描框设置大小
+        if (canvasHeight<canvasWidth){
             r = (canvasHeight / 2) - ((canvasHeight / 2) * WIDTH_SPACE_RATIO);
+        }else{
+            r = (canvasWidth / 2) - ((canvasWidth / 2) * WIDTH_SPACE_RATIO);
         }
 
 
@@ -162,11 +160,13 @@ public class FaceRoundView extends View {
         } else {
             mPathPaint.setPathEffect(null);
         }
-        canvas.drawCircle(mX, mY, mR + CIRCLE_SPACE, mPathPaint);
-        canvas.drawCircle(mX, mY, mR, mFaceRoundPaint);
-//        if (mFaceRect != null) {
-//            canvas.drawRect(mFaceRect, mFaceRectPaint);
-//        }
+//        canvas.drawCircle(mX, mY, mR + CIRCLE_SPACE, mPathPaint);
+//        canvas.drawCircle(mX, mY, mR, mFaceRoundPaint);
+
+        //TODO   方形  外框形状
+        if (mFaceRect != null) {
+            canvas.drawRect(mFaceRect, mFaceRectPaint);
+        }
 //        if (mFaceDetectRect != null) {
 //            canvas.drawRect(mFaceDetectRect, mFaceRectPaint);
 //        }
